@@ -4,9 +4,7 @@ on:
     workflow_dispatch:
 
 concurrency:
-  # Groups by workflow name and branch/PR ref
   group: ${{ github.workflow }}-${{ github.ref }}
-  # Automatically cancels older runs that are still in progress
   cancel-in-progress: true 
 
 jobs:
@@ -23,9 +21,14 @@ jobs:
             - name: Setup Java JDK
               uses: actions/setup-java@v4
               with:
-                  # The Java version to set up. Takes a whole or semver Java version. See examples of supported syntax in README file
                   java-version: "11"
                   distribution: "adopt"
+            - name: Upload Build Artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: java-app-jar    
+                path: target/*.jar
+
             - name: "build with maven"
               run: mvn clean install
             - name: "docker build"
