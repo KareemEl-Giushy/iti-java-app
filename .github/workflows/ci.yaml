@@ -23,14 +23,13 @@ jobs:
               with:
                   java-version: "11"
                   distribution: "adopt"
+            - name: "build with maven"
+              run: mvn clean install
             - name: Upload Build Artifact
               uses: actions/upload-artifact@v4
               with:
                 name: java-app-jar    
                 path: target/*.jar
-
-            - name: "build with maven"
-              run: mvn clean install
             - name: "docker build"
               run: docker build -t $IMAGE_NAME .
             - name: "docker login"
