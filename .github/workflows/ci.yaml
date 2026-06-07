@@ -1,0 +1,35 @@
+name: CI Pipeline
+
+on:
+    workflow_dispatch:
+
+concurrency:
+  # Groups by workflow name and branch/PR ref
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Automatically cancels older runs that are still in progress
+  cancel-in-progress: true 
+
+jobs:
+    ci-job:
+        runs-on: ubuntu-latest
+        environment: env
+        env:
+            IMAGE_NAME: kareemelgiushy/java:v${{github.run_number}}
+        steps:
+            - uses: actions/checkout@v4
+            - name: "kareem"
+              run: |
+                echo "heelo"
+            - name: Setup Java JDK
+              uses: actions/setup-java@v5.2.0
+              with:
+                  # The Java version to set up. Takes a whole or semver Java version. See examples of supported syntax in README file
+                  java-version: "11"
+            - name: "build with maven"
+              run: mvn clean install
+            - name: "docker build"
+              run: docker build -t $IMAGE_NAME
+            - name: "docker login"
+              run: docker login -u ${{secrets.DOCKERUSERNAME}} -p ${{secrets.DOCKERPASS}}
+            - name: "docker push image"
+              run: docker push $IMAGE_NAME
